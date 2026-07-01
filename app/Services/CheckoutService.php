@@ -6,11 +6,13 @@ use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\User;
+use App\Notifications\OrderCreated;
 use App\Repositories\Contracts\CartRepositoryInterface;
 use App\Repositories\Contracts\OrderRepositoryInterface;
 use App\Repositories\Contracts\OrderItemRepositoryInterface;
 use App\Repositories\Contracts\ProductRepositoryInterface;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
 
 class CheckoutService
@@ -22,6 +24,28 @@ class CheckoutService
         protected ProductRepositoryInterface $productRepository,
         protected CartService $cartService
     ) {}
+
+    /**
+     * Send Telegram notifications about the new order to all admin users.
+     */
+    protected function sendOrderNotifications(Order $order): void
+    {
+        $admins = User::where('role', User::ROLE_ADMIN)
+            ->whereNotNull('telegram_chat_id')
+            ->get();
+
+        if ($admins->isNotEmpty()) {
+            Notification::send($admins, new OrderCreated($order));
+            return;
+        }
+
+        // Fallback: notify the configured admin chat ID if no admins have chat_ids set
+        $adminChatId = config('services.telegram.chat_id');
+        if ($adminChatId) {
+            Notification::route('telegram', $adminChatId)
+                ->notify(new OrderCreated($order));
+        }
+    }
 
     /**
      * Convert the user's cart into an order.
@@ -85,6 +109,10 @@ class CheckoutService
 
             // Clear cart
             $this->cartRepository->clear($cart);
+
+            // Send Telegram notification to admin users
+            $order->load('items', 'user');
+            $this->sendOrderNotifications($order);
 
             return $order->fresh(['items', 'user']);
         });

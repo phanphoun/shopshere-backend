@@ -58,8 +58,8 @@
                         </td>
                         <td>{{ $order->items->count() }}</td>
                         <td><strong>${{ number_format($order->total, 2) }}</strong></td>
-                        <td>{!! $order->payment_badge !!}</td>
-                        <td>{!! $order->status_badge !!}</td>
+                        <td><span class="badge {{ $order->payment_class }}">{{ ucfirst($order->payment_status) }}</span></td>
+                        <td><span class="badge {{ $order->status_class }}">{{ ucfirst($order->status) }}</span></td>
                         <td>{{ $order->created_at->format('M d, Y H:i') }}</td>
                         <td class="text-end">
                             <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm btn-outline-primary">

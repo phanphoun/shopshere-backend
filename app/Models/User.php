@@ -29,6 +29,7 @@ class User extends Authenticatable
         'phone',
         'address',
         'avatar',
+        'telegram_chat_id',
         'role',
         'status',
     ];
@@ -92,6 +93,24 @@ class User extends Authenticatable
     /**
      * Get the avatar URL with fallback.
      */
+    /* ------------------------------------------------------------------ */
+    /*  Notification routing                                                 */
+    /* ------------------------------------------------------------------ */
+
+    /**
+     * Route Telegram notifications to the user's chat ID.
+     * Admin users are notified to the configured admin chat ID.
+     */
+    public function routeNotificationForTelegram(): string
+    {
+        if ($this->telegram_chat_id) {
+            return $this->telegram_chat_id;
+        }
+
+        // Fall back to the configured admin chat ID
+        return config('services.telegram.chat_id', '');
+    }
+
     public function getAvatarUrlAttribute(): ?string
     {
         if ($this->avatar && file_exists(storage_path('app/public/' . $this->avatar))) {

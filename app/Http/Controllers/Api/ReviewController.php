@@ -99,13 +99,19 @@ class ReviewController extends Controller
     )]
     public function store(ReviewRequest $request): JsonResponse
     {
-        $product = $this->productRepository->findById((int) $request->input('product_id'));
+        $productId = (int) $request->input('product_id');
+        $product = $this->productRepository->findById($productId);
         if (!$product) {
             return response()->json([
                 'success' => false,
                 'message' => 'Product not found.',
             ], 404);
         }
+
+        $this->authorize('create', [
+            \App\Models\Review::class,
+            $productId,
+        ]);
 
         $review = $this->reviewService->review(
             $request->user(),

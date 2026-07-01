@@ -18,9 +18,6 @@ class ProductTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->admin = User::factory()->create(['role' => 'admin']);
-        $this->customer = User::factory()->create(['role' => 'customer']);
     }
 
     public function test_can_list_products(): void
@@ -36,13 +33,27 @@ class ProductTest extends TestCase
     public function test_can_filter_products(): void
     {
         $category = Category::factory()->create();
-        Product::factory()->create(['category_id' => $category->id, 'price' => 100]);
-        Product::factory()->create(['price' => 200]);
 
-        $response = $this->getJson('/api/products?min_price=150');
+        Product::factory()->create([
+            'category_id' => $category->id,
+            'name' => 'Cheap Product',
+            'price' => 100,
+            'status' => true,
+        ]);
 
-        $response->assertOk();
-        $this->assertCount(1, $response->json('data'));
+        Product::factory()->create([
+            'category_id' => $category->id,
+            'name' => 'Expensive Product',
+            'price' => 200,
+            'status' => true,
+        ]);
+
+        $response = $this->getJson('/api/products?min_price=150&per_page=5');
+
+        $response->assertOk()
+            ->assertJsonStructure(['success', 'data', 'meta'])
+            ->assertJsonPath('meta.total', 1)
+            ->assertJsonPath('data.0.name', 'Expensive Product');
     }
 
     public function test_can_search_products(): void

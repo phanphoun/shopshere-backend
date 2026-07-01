@@ -20,12 +20,12 @@ class ReviewPolicy
     /**
      * Determine if the user can review a product.
      * Must have purchased the product before reviewing.
+     *
+     * @param  int  $productId  The product ID passed from the controller.
      */
-    public function create(User $user): bool
+    public function create(User $user, int $productId): bool
     {
-        $productId = (int) request()->input('product_id');
-
-        if (!$productId) {
+        if ($productId <= 0) {
             return false;
         }
 

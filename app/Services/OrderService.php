@@ -3,7 +3,12 @@
 namespace App\Services;
 
 use App\Models\Order;
+use App\Models\User;
+use App\Notifications\OrderCreated;
+use App\Notifications\OrderStatusUpdated;
+use App\Notifications\PaymentReceived;
 use App\Repositories\Contracts\OrderRepositoryInterface;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
 
 class OrderService
@@ -28,7 +33,72 @@ class OrderService
             ]);
         }
 
-        return $this->orderRepository->updateStatus($order, $status);
+        $oldStatus = $order->status;
+        $order = $this->orderRepository->updateStatus($order, $status);
+
+        // Send Telegram notifications about the status change
+        $this->sendStatusUpdateNotifications($order, $oldStatus, $status);
+
+        return $order;
+    }
+
+    /**
+     * Mark an order as paid and send payment notification.
+     */
+    public function markAsPaid(Order $order): Order
+    {
+        $order->payment_status = Order::PAYMENT_PAID;
+        $order->save();
+
+        $this->sendPaymentNotifications($order);
+
+        return $order;
+    }
+
+    /**
+     * Send Telegram notifications about order status changes to admin users.
+     */
+    protected function sendStatusUpdateNotifications(Order $order, string $oldStatus, string $newStatus): void
+    {
+        $order->load('user');
+
+        $admins = User::where('role', User::ROLE_ADMIN)
+            ->whereNotNull('telegram_chat_id')
+            ->get();
+
+        if ($admins->isNotEmpty()) {
+            Notification::send($admins, new OrderStatusUpdated($order, $oldStatus, $newStatus));
+            return;
+        }
+
+        $adminChatId = config('services.telegram.chat_id');
+        if ($adminChatId) {
+            Notification::route('telegram', $adminChatId)
+                ->notify(new OrderStatusUpdated($order, $oldStatus, $newStatus));
+        }
+    }
+
+    /**
+     * Send Telegram notifications about payment received.
+     */
+    protected function sendPaymentNotifications(Order $order): void
+    {
+        $order->load('user');
+
+        $admins = User::where('role', User::ROLE_ADMIN)
+            ->whereNotNull('telegram_chat_id')
+            ->get();
+
+        if ($admins->isNotEmpty()) {
+            Notification::send($admins, new PaymentReceived($order));
+            return;
+        }
+
+        $adminChatId = config('services.telegram.chat_id');
+        if ($adminChatId) {
+            Notification::route('telegram', $adminChatId)
+                ->notify(new PaymentReceived($order));
+        }
     }
 
 }

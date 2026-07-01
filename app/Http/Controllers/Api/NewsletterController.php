@@ -36,7 +36,7 @@ class NewsletterController extends Controller
     public function subscribe(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'email' => 'required|email|max:255',
+            'email' => 'required|email|max:255|unique:newsletter_subscribers,email',
         ]);
 
         $exists = NewsletterSubscriber::where('email', $data['email'])->exists();

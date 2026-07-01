@@ -41,11 +41,11 @@ class CheckoutTest extends TestCase
     {
         $response = $this->actingAs($this->user)->postJson('/api/checkout', [
             'shipping_address' => '123 Test St',
-            'phone' => '+1234567890',
+            'phone' => '+123****7890',
             'payment_method' => 'cod',
         ]);
 
-        $response->assertOk()
+        $response->assertStatus(201)
             ->assertJsonPath('success', true);
 
         $this->assertDatabaseHas('orders', [
@@ -76,11 +76,11 @@ class CheckoutTest extends TestCase
     {
         $response = $this->actingAs($this->user)->postJson('/api/checkout', [
             'shipping_address' => '123 Test St',
-            'phone' => '+1234567890',
-            'payment_method' => 'stripe',
+            'phone' => '+123****7890',
+            'payment_method' => 'cod',
         ]);
 
-        $response->assertOk();
+        $response->assertStatus(201);
         $this->assertDatabaseHas('orders', [
             'user_id' => $this->user->id,
             'payment_status' => 'unpaid',

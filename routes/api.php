@@ -65,6 +65,15 @@ Route::middleware('throttle:auth')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
+| Telegram Bot Webhook (public - called by Telegram)
+|--------------------------------------------------------------------------
+*/
+
+Route::post('telegram/webhook', [\App\Http\Controllers\Api\TelegramController::class, 'webhook'])
+    ->middleware('throttle:api');
+
+/*
+|--------------------------------------------------------------------------
 | Authenticated API Routes
 |--------------------------------------------------------------------------
 */
@@ -95,4 +104,10 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
 
     // Reviews
     Route::post('reviews', [ReviewController::class, 'store']);
+
+    // Telegram
+    Route::get('telegram/token', [\App\Http\Controllers\Api\TelegramController::class, 'generateToken']);
+    Route::post('telegram/connect', [\App\Http\Controllers\Api\TelegramController::class, 'connect']);
+    Route::delete('telegram/disconnect', [\App\Http\Controllers\Api\TelegramController::class, 'disconnect']);
+    Route::get('telegram/status', [\App\Http\Controllers\Api\TelegramController::class, 'status']);
 });

@@ -10,8 +10,8 @@
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="m-0">Order Items</h5>
                 <div>
-                    {!! $order->status_badge !!}
-                    {!! $order->payment_badge !!}
+                    <span class="badge {{ $order->status_class }}">{{ ucfirst($order->status) }}</span>
+                    <span class="badge {{ $order->payment_class }}">{{ ucfirst($order->payment_status) }}</span>
                 </div>
             </div>
 
@@ -102,7 +102,15 @@
         <div class="card p-4">
             <h5 class="mb-3">Payment Info</h5>
             <p class="mb-1"><strong>Method:</strong> {{ ucfirst($order->payment_method ?? 'N/A') }}</p>
-            <p class="mb-0"><strong>Status:</strong> {!! $order->payment_badge !!}</p>
+            <p class="mb-0"><strong>Status:</strong> <span class="badge {{ $order->payment_class }}">{{ ucfirst($order->payment_status) }}</span></p>
+            @if (!$order->isPaid())
+                <form method="POST" action="{{ route('admin.orders.mark-paid', $order) }}" class="mt-2">
+                    @csrf
+                    <button type="submit" class="btn btn-success btn-sm w-100">
+                        <i class="bi bi-check-circle"></i> Mark as Paid
+                    </button>
+                </form>
+            @endif
             <hr>
             <p class="mb-1"><strong>Created:</strong> {{ $order->created_at->format('M d, Y H:i') }}</p>
             @if ($order->shipped_at)

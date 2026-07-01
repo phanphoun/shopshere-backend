@@ -46,6 +46,13 @@ class OrderController extends Controller
         return back()->with('success', 'Order status updated.');
     }
 
+    public function markAsPaid(Order $order): RedirectResponse
+    {
+        $this->orderService->markAsPaid($order);
+
+        return back()->with('success', 'Order marked as paid.');
+    }
+
     public function invoice(Order $order): View
     {
         $order->load(['items.product', 'user']);

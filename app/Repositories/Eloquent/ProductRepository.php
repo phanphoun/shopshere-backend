@@ -155,7 +155,7 @@ class ProductRepository implements ProductRepositoryInterface
         $query->active();
 
         if (!empty($filters['search'])) {
-            $search = $filters['search'];
+            $search = static::escapeLike($filters['search']);
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                   ->orWhere('description', 'like', "%{$search}%")
@@ -191,6 +191,14 @@ class ProductRepository implements ProductRepositoryInterface
             $query->where('status', (bool) $filters['status']);
             $query->withoutGlobalScopes();
         }
+    }
+
+    /**
+     * Escape special LIKE wildcard characters (% and _) in a search string.
+     */
+    protected static function escapeLike(string $value): string
+    {
+        return str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $value);
     }
 
     protected function applySorting(Builder $query, string $sort): void

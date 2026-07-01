@@ -185,7 +185,7 @@
                                 </td>
                                 <td>{{ $order->user->name ?? 'Guest' }}</td>
                                 <td>${{ number_format($order->total, 2) }}</td>
-                                <td>{!! $order->status_badge !!}</td>
+                                <td><span class="badge {{ $order->status_class }}">{{ ucfirst($order->status) }}</span></td>
                                 <td>{{ $order->created_at->diffForHumans() }}</td>
                             </tr>
                         @empty

@@ -90,23 +90,29 @@ class Order extends Model
     /*  Accessors                                                           */
     /* ------------------------------------------------------------------ */
 
-    public function getStatusBadgeAttribute(): string
+    /**
+     * Return the Bootstrap CSS class for the current order status.
+     */
+    public function getStatusClassAttribute(): string
     {
         return match ($this->status) {
-            self::STATUS_PENDING    => '<span class="badge bg-warning text-dark">Pending</span>',
-            self::STATUS_PROCESSING => '<span class="badge bg-info">Processing</span>',
-            self::STATUS_SHIPPED    => '<span class="badge bg-primary">Shipped</span>',
-            self::STATUS_DELIVERED  => '<span class="badge bg-success">Delivered</span>',
-            self::STATUS_CANCELLED  => '<span class="badge bg-danger">Cancelled</span>',
-            default                 => '<span class="badge bg-secondary">Unknown</span>',
+            self::STATUS_PENDING    => 'bg-warning text-dark',
+            self::STATUS_PROCESSING => 'bg-info',
+            self::STATUS_SHIPPED    => 'bg-primary',
+            self::STATUS_DELIVERED  => 'bg-success',
+            self::STATUS_CANCELLED  => 'bg-danger',
+            default                 => 'bg-secondary',
         };
     }
 
-    public function getPaymentBadgeAttribute(): string
+    /**
+     * Return the Bootstrap CSS class for the current payment status.
+     */
+    public function getPaymentClassAttribute(): string
     {
         return $this->payment_status === self::PAYMENT_PAID
-            ? '<span class="badge bg-success">Paid</span>'
-            : '<span class="badge bg-warning text-dark">Unpaid</span>';
+            ? 'bg-success'
+            : 'bg-warning text-dark';
     }
 
     public function isPending(): bool    { return $this->status === self::STATUS_PENDING; }
