@@ -49,6 +49,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('users/{user}/edit', [AdminUserController::class, 'edit'])->name('users.edit');
         Route::put('users/{user}', [AdminUserController::class, 'update'])->name('users.update');
         Route::delete('users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
+
+        // Support
+        Route::get('support', [\App\Http\Controllers\Admin\SupportController::class, 'index'])->name('support.index');
+        Route::get('support/{conversation}', [\App\Http\Controllers\Admin\SupportController::class, 'show'])->name('support.show');
+        Route::post('support/{conversation}/reply', [\App\Http\Controllers\Admin\SupportController::class, 'reply'])->name('support.reply');
+        Route::patch('support/{conversation}/close', [\App\Http\Controllers\Admin\SupportController::class, 'close'])->name('support.close');
+        Route::patch('support/{conversation}/reopen', [\App\Http\Controllers\Admin\SupportController::class, 'reopen'])->name('support.reopen');
     });
 });
 

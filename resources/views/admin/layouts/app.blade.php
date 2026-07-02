@@ -270,6 +270,9 @@
             <a href="{{ route('admin.users.index') }}" class="nav-link {{ request()->routeIs('admin.users*') ? 'active' : '' }}">
                 <i class="bi bi-people"></i> Users
             </a>
+            <a href="{{ route('admin.support.index') }}" class="nav-link {{ request()->routeIs('admin.support*') ? 'active' : '' }}">
+                <i class="bi bi-chat-dots"></i> Support
+            </a>
             <div class="nav-divider"></div>
             <form method="POST" action="{{ route('admin.logout') }}" class="logout-btn">
                 @csrf

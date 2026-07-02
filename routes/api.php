@@ -69,7 +69,7 @@ Route::middleware('throttle:auth')->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::post('telegram/webhook', [\App\Http\Controllers\Api\TelegramController::class, 'webhook'])
+Route::post('telegram/webhook', [App\Http\Controllers\Api\TelegramController::class, 'webhook'])
     ->middleware('throttle:api');
 
 /*
@@ -106,8 +106,14 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
     Route::post('reviews', [ReviewController::class, 'store']);
 
     // Telegram
-    Route::get('telegram/token', [\App\Http\Controllers\Api\TelegramController::class, 'generateToken']);
-    Route::post('telegram/connect', [\App\Http\Controllers\Api\TelegramController::class, 'connect']);
-    Route::delete('telegram/disconnect', [\App\Http\Controllers\Api\TelegramController::class, 'disconnect']);
-    Route::get('telegram/status', [\App\Http\Controllers\Api\TelegramController::class, 'status']);
+    Route::get('telegram/token', [App\Http\Controllers\Api\TelegramController::class, 'generateToken']);
+    Route::post('telegram/connect', [App\Http\Controllers\Api\TelegramController::class, 'connect']);
+    Route::delete('telegram/disconnect', [App\Http\Controllers\Api\TelegramController::class, 'disconnect']);
+    Route::get('telegram/status', [App\Http\Controllers\Api\TelegramController::class, 'status']);
+
+    // Support
+    Route::post('support/start', [App\Http\Controllers\Api\SupportController::class, 'start']);
+    Route::get('support/messages/{id}', [App\Http\Controllers\Api\SupportController::class, 'messages']);
+    Route::post('support/send', [App\Http\Controllers\Api\SupportController::class, 'send']);
+    Route::get('support/conversations', [App\Http\Controllers\Api\SupportController::class, 'list']);
 });
