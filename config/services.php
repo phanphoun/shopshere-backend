@@ -28,7 +28,12 @@ return [
     'telegram' => [
         'token' => env('TELEGRAM_BOT_TOKEN'),
         'chat_id' => env('TELEGRAM_ADMIN_CHAT_ID'),
+        'bot_username' => env('TELEGRAM_BOT_USERNAME', 'ShopSphereBot'),
+        'bot_mode' => env('TELEGRAM_BOT_MODE', 'support'),
+        'webhook_secret' => env('TELEGRAM_WEBHOOK_SECRET'),
     ],
+
+    'frontend_url' => env('FRONTEND_URL', 'http://localhost:3000'),
 
     'google' => [
         'client_id' => env('GOOGLE_CLIENT_ID'),

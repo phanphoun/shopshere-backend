@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\SocialAuthController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\CartController;
@@ -18,6 +19,8 @@ use App\Http\Controllers\Api\ReviewController;
 */
 
 Route::middleware(['throttle:api', 'locale'])->group(function () {
+    Route::get('social/auth/redirect/{driver}', [SocialAuthController::class, 'redirect'])->whereIn('driver', ['google']);
+    Route::get('social/auth/callback/{driver}', [SocialAuthController::class, 'callback'])->whereIn('driver', ['google']);
     Route::redirect('docs', 'documentation', 301);
 
     // Categories
@@ -82,7 +85,7 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
     // Auth
     Route::post('logout', [AuthController::class, 'logout']);
     Route::get('profile', [AuthController::class, 'profile']);
-    Route::put('profile', [AuthController::class, 'updateProfile']);
+    Route::match(['PUT', 'POST'], 'profile', [AuthController::class, 'updateProfile']);
     Route::put('change-password', [AuthController::class, 'changePassword']);
 
     // Cart

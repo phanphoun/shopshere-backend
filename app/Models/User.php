@@ -30,6 +30,7 @@ class User extends Authenticatable
         'address',
         'avatar',
         'telegram_chat_id',
+        'google_id',
         'role',
         'status',
     ];
@@ -43,7 +44,6 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
         ];
     }
 

@@ -15,16 +15,18 @@ class SupportConversation extends Model
         'customer_email',
         'status',
         'source',
-    ];
+        'telegram_chat_id',
+        'telegram_user_id',
+];
 
     protected $casts = [
         'closed_at' => 'datetime',
-    ];
+];
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
-    }
+}
 
     public function messages(): HasMany
     {
