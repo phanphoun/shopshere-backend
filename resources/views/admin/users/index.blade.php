@@ -76,11 +76,20 @@
                         </td>
                         <td class="text-muted">{{ $user->created_at->format('M d, Y') }}</td>
                         <td class="text-end">
-                            <a href="{{ route('admin.users.show', $user) }}" class="btn btn-sm btn-light border">
-                                <i class="bi bi-eye"></i> View
+                            <a href="{{ route('admin.users.show', $user) }}" class="btn btn-sm btn-light border" title="View">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-sm btn-light border" title="Edit">
+                                <i class="bi bi-pencil-square"></i>
                             </a>
 
-                            <span class="badge text-bg-info">Your account</span>
+                            <button type="button"
+                                    class="btn btn-sm btn-light border text-danger"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteUserModal{{ $user->id }}"
+                                    title="Delete">
+                                <i class="bi bi-trash"></i>
+                            </button>
                         </td>
                     </tr>
                 @empty
@@ -95,8 +104,36 @@
         </table>
     </div>
 
-    <div class="px-4 py-3">
+    <div class="px-4 py-3 d-flex justify-content-between align-items-center">
+        <a href="{{ route('admin.users.create') }}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i> Add User
+        </a>
+
         {{ $users->links() }}
     </div>
 </div>
+
+@foreach ($users as $user)
+    <div class="modal fade" id="deleteUserModal{{ $user->id }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title">Delete User</h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="POST" action="{{ route('admin.users.destroy', $user) }}" class="m-0">
+                    @csrf
+                    @method('DELETE')
+                    <div class="modal-body">
+                        Are you sure you want to delete <strong>{{ $user->name }}</strong>?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light border btn-sm" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+@endforeach
 @endsection

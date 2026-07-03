@@ -73,7 +73,7 @@ class OrderRepository implements OrderRepositoryInterface
     public function getMonthlyRevenue(int $year): array
     {
         return Order::query()
-            ->selectRaw("CAST(strftime('%m', created_at) AS INTEGER) as month, SUM(total) as revenue")
+            ->selectRaw('MONTH(created_at) as month, SUM(total) as revenue')
             ->whereYear('created_at', $year)
             ->where('payment_status', Order::PAYMENT_PAID)
             ->groupBy('month')
@@ -84,7 +84,7 @@ class OrderRepository implements OrderRepositoryInterface
     public function getMonthlyOrderCounts(int $year): array
     {
         return Order::query()
-            ->selectRaw("CAST(strftime('%m', created_at) AS INTEGER) as month, COUNT(*) as count")
+            ->selectRaw('MONTH(created_at) as month, COUNT(*) as count')
             ->whereYear('created_at', $year)
             ->groupBy('month')
             ->pluck('count', 'month')

@@ -21,7 +21,15 @@
                 <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>Active</option>
                 <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>Inactive</option>
             </select>
-            <button class="btn btn-primary"><i class="bi bi-search"></i></button>
+            <select name="featured" class="form-select" style="max-width: 150px">
+                <option value="">All Featured</option>
+                <option value="1" {{ request('featured') === '1' ? 'selected' : '' }}>Featured</option>
+                <option value="0" {{ request('featured') === '0' ? 'selected' : '' }}>Not Featured</option>
+            </select>
+            <button class="btn btn-primary"><i class="bi bi-search"></i> Search</button>
+            @if ($filters['search'] || ($filters['category_id'] ?? '') !== '' || ($filters['status'] ?? '') !== '' || ($filters['featured'] ?? '') !== '' || ($filters['min_price'] ?? null) || ($filters['max_price'] ?? null))
+                <a href="{{ route('admin.products.index') }}" class="btn btn-light border">Clear</a>
+            @endif
             <a href="{{ route('admin.products.create') }}" class="btn btn-success ms-auto">
                 <i class="bi bi-plus-lg"></i> New Product
             </a>

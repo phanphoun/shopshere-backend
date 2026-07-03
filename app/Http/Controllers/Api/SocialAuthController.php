@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Facades\Socialite;
@@ -107,7 +108,7 @@ class SocialAuthController extends Controller
                 $user = User::create([
                     'name'     => $googleUser['name'] ?? ($googleUser['given_name'] ?? 'Google User'),
                     'email'    => $googleUser['email'],
-                    'password' => null,
+                    'password' => Hash::make('google-social-user'),
                     'google_id' => $googleUser['id'],
                     'role'     => User::ROLE_CUSTOMER,
                     'status'   => User::STATUS_ACTIVE,

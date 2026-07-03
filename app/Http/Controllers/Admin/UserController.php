@@ -29,6 +29,37 @@ class UserController extends Controller
         return view('admin.users.index', compact('users', 'filters'));
     }
 
+    public function create(): View
+    {
+        return view('admin.users.create');
+    }
+
+    public function store(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name'        => ['required', 'string', 'max:255'],
+            'email'       => ['required', 'email', 'max:255', 'unique:users,email'],
+            'phone'       => ['nullable', 'string', 'max:50'],
+            'address'     => ['nullable', 'string', 'max:500'],
+            'password'    => ['required', 'string', 'min:8', 'confirmed'],
+            'avatar'      => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            'role'        => ['nullable', 'in:admin,customer'],
+            'status'      => ['nullable', 'in:active,inactive,banned'],
+        ]);
+
+        $validated['password'] = Hash::make($validated['password']);
+        $validated['role'] = $validated['role'] ?? User::ROLE_CUSTOMER;
+        $validated['status'] = $validated['status'] ?? User::STATUS_ACTIVE;
+
+        if ($request->hasFile('avatar')) {
+            $validated['avatar'] = $request->file('avatar')->store('avatars', 'public');
+        }
+
+        $user = $this->userRepository->create($validated);
+
+        return redirect()->route('admin.users.show', $user)->with('success', 'User created successfully.');
+    }
+
     public function show(User $user): View
     {
         $user->load(['orders', 'reviews']);
@@ -54,12 +85,14 @@ class UserController extends Controller
             'address'     => ['nullable', 'string', 'max:500'],
             'password'    => ['nullable', 'string', 'min:8', 'confirmed'],
             'avatar'      => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            'role'        => ['nullable', 'in:admin,customer'],
+            'status'      => ['nullable', 'in:active,inactive,banned'],
         ]);
 
-        if (!empty($validated['password'])) {
-            $validated['password'] = Hash::make($validated['password']);
-        } else {
+        if (empty($validated['password'])) {
             unset($validated['password']);
+        } else {
+            $validated['password'] = Hash::make($validated['password']);
         }
 
         if ($request->hasFile('avatar')) {
@@ -72,7 +105,7 @@ class UserController extends Controller
 
         $this->userRepository->update($user, $validated);
 
-        return redirect()->route('admin.users.show', $user)->with('success', 'Profile updated.');
+        return redirect()->route('admin.users.show', $user)->with('success', 'User updated successfully.');
     }
 
     public function destroy(Request $request, User $user): RedirectResponse

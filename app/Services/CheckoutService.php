@@ -12,8 +12,10 @@ use App\Repositories\Contracts\OrderRepositoryInterface;
 use App\Repositories\Contracts\OrderItemRepositoryInterface;
 use App\Repositories\Contracts\ProductRepositoryInterface;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
+use NotificationChannels\Telegram\Exceptions\CouldNotSendNotification;
 
 class CheckoutService
 {
@@ -35,15 +37,25 @@ class CheckoutService
             ->get();
 
         if ($admins->isNotEmpty()) {
-            Notification::send($admins, new OrderCreated($order));
+            try {
+                Notification::send($admins, new OrderCreated($order));
+            } catch (CouldNotSendNotification $e) {
+                Log::warning('Order notification failed', ['order_id' => $order->id, 'error' => $e->getMessage()]);
+            }
+
             return;
         }
 
         // Fallback: notify the configured admin chat ID if no admins have chat_ids set
         $adminChatId = config('services.telegram.chat_id');
+
         if ($adminChatId) {
-            Notification::route('telegram', $adminChatId)
-                ->notify(new OrderCreated($order));
+            try {
+                Notification::route('telegram', $adminChatId)
+                    ->notify(new OrderCreated($order));
+            } catch (CouldNotSendNotification $e) {
+                Log::warning('Order notification failed', ['order_id' => $order->id, 'error' => $e->getMessage()]);
+            }
         }
     }
 

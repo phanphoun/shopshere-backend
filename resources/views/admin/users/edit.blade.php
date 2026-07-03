@@ -22,8 +22,19 @@
             <p class="text-muted small">{{ $user->email }}</p>
 
             <div class="d-flex justify-content-center gap-2">
-                <span class="badge bg-primary">Admin</span>
-                <span class="badge bg-success">Active</span>
+                @if ($user->role === 'admin')
+                    <span class="badge bg-primary">Admin</span>
+                @else
+                    <span class="badge bg-secondary">Customer</span>
+                @endif
+
+                @if ($user->status === 'active')
+                    <span class="badge bg-success">Active</span>
+                @elseif ($user->status === 'banned')
+                    <span class="badge bg-danger">Banned</span>
+                @else
+                    <span class="badge bg-warning text-dark">Inactive</span>
+                @endif
             </div>
         </div>
     </div>

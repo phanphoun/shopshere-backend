@@ -33,7 +33,7 @@ class PaymentReceived extends Notification
             . "📦 *Order Status:* {$order->status}";
 
         return TelegramMessage::create()
-            ->to($notifiable->routeNotificationForTelegram())
+            ->to(method_exists($notifiable, 'routeNotificationForTelegram') ? $notifiable->routeNotificationForTelegram() : (string) config('services.telegram.chat_id'))
             ->content($text)
             ->button('View Order', route('admin.orders.show', $order));
     }

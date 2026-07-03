@@ -38,6 +38,8 @@ class Order extends Model
         'notes',
         'shipped_at',
         'delivered_at',
+        'aba_payway_txn_id',
+        'paid_at',
     ];
 
     protected $casts = [
@@ -48,6 +50,7 @@ class Order extends Model
         'total'         => 'decimal:2',
         'shipped_at'    => 'datetime',
         'delivered_at'  => 'datetime',
+        'paid_at'       => 'datetime',
     ];
 
     /* ------------------------------------------------------------------ */

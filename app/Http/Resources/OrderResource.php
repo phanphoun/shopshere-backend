@@ -29,6 +29,8 @@ class OrderResource extends JsonResource
             'shipping_address'=> $this->shipping_address,
             'phone'           => $this->phone,
             'notes'           => $this->notes,
+            'aba_payway_txn_id' => $this->aba_payway_txn_id,
+            'paid_at'      => $this->paid_at?->toISOString(),
             'shipped_at'      => $this->shipped_at?->toISOString(),
             'delivered_at'    => $this->delivered_at?->toISOString(),
             'items_count'     => (int) $this->items->sum('quantity'),

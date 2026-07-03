@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\CheckoutController;
 use App\Http\Controllers\Api\NewsletterController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ReviewController;
+use App\Http\Controllers\Api\AbaPaywayCallbackController;
 
 /*
 |--------------------------------------------------------------------------
@@ -73,7 +74,8 @@ Route::middleware('throttle:auth')->group(function () {
 */
 
 Route::post('telegram/webhook', [App\Http\Controllers\Api\TelegramController::class, 'webhook'])
-    ->middleware('throttle:api');
+    ->withoutMiddleware('throttle:api')
+    ->name('telegram.webhook');
 
 /*
 |--------------------------------------------------------------------------
@@ -113,6 +115,9 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
     Route::post('telegram/connect', [App\Http\Controllers\Api\TelegramController::class, 'connect']);
     Route::delete('telegram/disconnect', [App\Http\Controllers\Api\TelegramController::class, 'disconnect']);
     Route::get('telegram/status', [App\Http\Controllers\Api\TelegramController::class, 'status']);
+
+    // Payment
+    Route::post('payments/aba/callback', [AbaPaywayCallbackController::class, 'handle']);
 
     // Support
     Route::post('support/start', [App\Http\Controllers\Api\SupportController::class, 'start']);

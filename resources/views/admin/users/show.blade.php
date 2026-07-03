@@ -36,17 +36,11 @@
                 @endif
             </div>
 
-            <hr>
-
-            <div class="text-start">
-                <p class="mb-2"><strong>Phone:</strong> {{ $user->phone ?? '—' }}</p>
-                <p class="mb-2"><strong>Address:</strong> {{ $user->address ?? '—' }}</p>
-                <p class="mb-2"><strong>Joined:</strong> {{ $user->created_at->format('M d, Y') }}</p>
+            <div class="d-flex justify-content-center gap-2 mt-3">
+                <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-primary w-100">
+                    <i class="bi bi-pencil-square me-1"></i> Edit User
+                </a>
             </div>
-
-            <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-primary w-100 mt-3">
-                <i class="bi bi-pencil-square me-1"></i> Edit Profile
-            </a>
         </div>
     </div>
 

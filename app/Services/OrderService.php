@@ -8,8 +8,10 @@ use App\Notifications\OrderCreated;
 use App\Notifications\OrderStatusUpdated;
 use App\Notifications\PaymentReceived;
 use App\Repositories\Contracts\OrderRepositoryInterface;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
+use NotificationChannels\Telegram\Exceptions\CouldNotSendNotification;
 
 class OrderService
 {
@@ -67,14 +69,24 @@ class OrderService
             ->get();
 
         if ($admins->isNotEmpty()) {
-            Notification::send($admins, new OrderStatusUpdated($order, $oldStatus, $newStatus));
+            try {
+                Notification::send($admins, new OrderStatusUpdated($order, $oldStatus, $newStatus));
+            } catch (CouldNotSendNotification $e) {
+                Log::warning('Order status notification failed', ['order_id' => $order->id, 'error' => $e->getMessage()]);
+            }
+
             return;
         }
 
         $adminChatId = config('services.telegram.chat_id');
+
         if ($adminChatId) {
-            Notification::route('telegram', $adminChatId)
-                ->notify(new OrderStatusUpdated($order, $oldStatus, $newStatus));
+            try {
+                Notification::route('telegram', $adminChatId)
+                    ->notify(new OrderStatusUpdated($order, $oldStatus, $newStatus));
+            } catch (CouldNotSendNotification $e) {
+                Log::warning('Order status notification failed', ['order_id' => $order->id, 'error' => $e->getMessage()]);
+            }
         }
     }
 
@@ -90,14 +102,24 @@ class OrderService
             ->get();
 
         if ($admins->isNotEmpty()) {
-            Notification::send($admins, new PaymentReceived($order));
+            try {
+                Notification::send($admins, new PaymentReceived($order));
+            } catch (CouldNotSendNotification $e) {
+                Log::warning('Payment notification failed', ['order_id' => $order->id, 'error' => $e->getMessage()]);
+            }
+
             return;
         }
 
         $adminChatId = config('services.telegram.chat_id');
+
         if ($adminChatId) {
-            Notification::route('telegram', $adminChatId)
-                ->notify(new PaymentReceived($order));
+            try {
+                Notification::route('telegram', $adminChatId)
+                    ->notify(new PaymentReceived($order));
+            } catch (CouldNotSendNotification $e) {
+                Log::warning('Payment notification failed', ['order_id' => $order->id, 'error' => $e->getMessage()]);
+            }
         }
     }
 
